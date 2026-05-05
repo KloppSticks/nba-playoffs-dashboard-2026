@@ -227,6 +227,53 @@
   .cell-red    { color: var(--red); }
   .cell-dim    { color: var(--text-mute); }
 
+  /* === Results view === */
+  .results-filter { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .results-filter label { font-size: 12px; color: var(--text-dim); }
+  .results-filter select { background: var(--bg-card); color: var(--text); border: 1px solid var(--border-strong); border-radius: 4px; padding: 4px 8px; font-size: 12px; font-family: inherit; cursor: pointer; }
+  .results-filter select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .metric-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .metric-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
+  .metric-box .mb-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-mute); margin-bottom: 4px; }
+  .metric-box .mb-value { font-size: 22px; font-weight: 600; font-family: "SF Mono", Menlo, monospace; }
+  .metric-box .mb-sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .metric-box.pos .mb-value { color: var(--green); }
+  .metric-box.neg .mb-value { color: var(--red); }
+  .splits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  @media (max-width: 600px) { .splits-grid { grid-template-columns: 1fr; } }
+  .split-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
+  .split-box h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-mute); margin-bottom: 8px; }
+  .split-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 4px 0; }
+  .split-row .sr-label { color: var(--text-dim); }
+  .split-row .sr-val { font-family: "SF Mono", Menlo, monospace; font-weight: 600; }
+  .results-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; overflow-x: auto; }
+  .results-section h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); margin-bottom: 12px; }
+  .results-empty { color: var(--text-mute); font-size: 13px; font-style: italic; }
+  .results-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 400px; }
+  .results-table th { text-align: left; color: var(--text-mute); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .results-table td { padding: 7px 8px; border-bottom: 1px solid var(--border); }
+  .results-table tr:last-child td { border-bottom: none; }
+  .results-table .mono { font-family: "SF Mono", Menlo, monospace; }
+  .ats-cover { color: var(--green); font-weight: 600; }
+  .ats-miss  { color: var(--red); }
+  .ats-push, .ou-push { color: var(--text-mute); }
+  .ou-over   { color: var(--yellow); font-weight: 600; }
+  .ou-under  { color: var(--accent); }
+  .res-chart-wrap { margin: 10px 0; }
+  .res-chart-label { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; font-weight: 600; }
+  .res-correction-note { font-size: 11px; color: var(--yellow); margin-top: 4px; }
+  .res-chart-item { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .res-chart-item:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+  .lm-game { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .lm-game:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .lm-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .lm-table { border-collapse: collapse; font-size: 11px; }
+  .lm-table th, .lm-table td { padding: 4px 10px; text-align: right; border-bottom: 1px solid var(--border); font-family: "SF Mono", Menlo, monospace; }
+  .lm-table th:first-child, .lm-table td:first-child { text-align: left; font-family: inherit; color: var(--text-mute); }
+  .lm-table .model-row td { color: var(--fav); font-weight: 600; }
+  .lm-table tr:last-child td { border-bottom: none; }
+  .lm-note { font-size: 11px; color: var(--text-mute); margin-top: 10px; line-height: 1.5; }
+
   /* Loading / error states */
   @keyframes spin { to { transform: rotate(360deg); } }
   #app-loading { text-align: center; padding: 80px 20px; color: var(--text-dim); }
@@ -244,6 +291,7 @@
   <button data-tab="today" class="active">Today</button>
   <button data-tab="bracket">Bracket</button>
   <button data-tab="game">Game Detail</button>
+  <button data-tab="results">Results</button>
   <button data-tab="detail">Series Detail</button>
   <button data-tab="backtest">Backtest</button>
   <button data-tab="model">Model Info</button>
@@ -256,6 +304,7 @@
     <section id="today-view" class="view active"></section>
     <section id="bracket-view" class="view"></section>
     <section id="game-view" class="view"></section>
+    <section id="results-view" class="view"></section>
     <section id="detail-view" class="view"></section>
     <section id="backtest-view" class="view"></section>
     <section id="model-view" class="view"></section>
@@ -328,6 +377,7 @@ const state = {
   picks: {},               // slot_id -> {a: abbr, b: abbr}   (user's current selections per slot)
   detailSlot: null,        // slot_id currently displayed in detail view
   todayGame: null,         // game object from today_games, set when user taps a game card
+  resultsVersion: "all",   // model version filter for Results tab
 };
 
 // ========== Data helpers ==========
@@ -843,6 +893,338 @@ function renderModelInfo() {
   root.appendChild(lims);
 }
 
+// ========== Results view ==========
+function computeMetrics(games) {
+  let pickW = 0, pickL = 0, atsW = 0, atsL = 0, atsP = 0, ouO = 0, ouU = 0, ouP = 0;
+  const clvVals = [];
+  for (const g of games) {
+    if (g.actual_spread != null && Math.abs(g.actual_spread) > 0.1) {
+      if ((g.model_pick === "home") === (g.actual_spread > 0)) pickW++; else pickL++;
+    }
+    if (g.ats_result === "cover") atsW++;
+    else if (g.ats_result === "miss") atsL++;
+    else if (g.ats_result === "push") atsP++;
+    if (g.ou_result === "over") ouO++;
+    else if (g.ou_result === "under") ouU++;
+    else if (g.ou_result === "push") ouP++;
+    if (g.clv != null) clvVals.push(g.clv);
+  }
+  const clvMean = clvVals.length ? clvVals.reduce((a, b) => a + b, 0) / clvVals.length : null;
+  return {
+    pick: { w: pickW, l: pickL },
+    ats:  { w: atsW, l: atsL, p: atsP },
+    ou:   { o: ouO, u: ouU, p: ouP },
+    clv:  { mean: clvMean, pos: clvVals.filter(c => c > 0).length, total: clvVals.length },
+  };
+}
+
+function seriesPredWinner(seriesId) {
+  const teamPart = (seriesId || "").split("_")[0];
+  const sr = PREDICTIONS.series_results[teamPart] ||
+             PREDICTIONS.series_results[teamPart.split("|").reverse().join("|")];
+  if (!sr) return null;
+  return sr.p_higher_wins_series >= 0.5 ? sr.higher_abbr : sr.lower_abbr;
+}
+
+function buildSeriesSummary(games) {
+  const byId = {};
+  for (const g of games) {
+    const sid = g.series_id || "unknown";
+    if (!byId[sid]) byId[sid] = { series_id: sid, games: [] };
+    byId[sid].games.push(g);
+  }
+  return Object.values(byId).map(s => {
+    const teams = s.series_id.split("_")[0].split("|");
+    const teamWins = {};
+    for (const t of teams) teamWins[t] = 0;
+    let pickW = 0, pickL = 0, atsW = 0, atsL = 0, atsP = 0, ouO = 0, ouU = 0, ouP = 0;
+    for (const g of s.games) {
+      if (g.actual_spread != null && Math.abs(g.actual_spread) > 0.1) {
+        const winner = g.actual_spread > 0 ? g.home_team : g.away_team;
+        teamWins[winner] = (teamWins[winner] || 0) + 1;
+        if ((g.model_pick === "home") === (g.actual_spread > 0)) pickW++; else pickL++;
+      }
+      if (g.ats_result === "cover") atsW++;
+      else if (g.ats_result === "miss") atsL++;
+      else if (g.ats_result === "push") atsP++;
+      if (g.ou_result === "over") ouO++;
+      else if (g.ou_result === "under") ouU++;
+      else if (g.ou_result === "push") ouP++;
+    }
+    let leader = null, lW = 0, lL = 0;
+    for (const [t, w] of Object.entries(teamWins)) {
+      if (w > lW) { if (leader) lL = lW; leader = t; lW = w; } else lL += w;
+    }
+    return {
+      label:     s.series_id.split("_")[0].replace("|", " vs "),
+      predicted: seriesPredWinner(s.series_id) || "—",
+      actual:    leader ? leader + " " + lW + "–" + lL : "—",
+      played:    s.games.length,
+      pick:      pickW + "–" + pickL,
+      ats:       atsW + "–" + atsL + "–" + atsP,
+      ou:        ouO + "–" + ouU + "–" + ouP,
+    };
+  });
+}
+
+function residualSparkline(seriesData) {
+  const res = seriesData.games.map(g => g.residual).filter(r => r != null);
+  if (!res.length) return "";
+  const W = 200, H = 56, pad = 8, iH = H - pad * 2;
+  const maxAbs = Math.max(...res.map(Math.abs), 3);
+  const toX = i  => pad + (i / Math.max(res.length - 1, 1)) * (W - pad * 2);
+  const toY = v  => pad + ((maxAbs - v) / (maxAbs * 2)) * iH;
+  const zeroY = toY(0);
+  const pts = res.map((r, i) => toX(i) + "," + toY(r)).join(" ");
+  const correction = seriesData.active_correction;
+  let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:' + H + 'px;display:block;border-radius:4px;background:var(--bg)">';
+  svg += '<line x1="' + pad + '" y1="' + zeroY + '" x2="' + (W - pad) + '" y2="' + zeroY + '" stroke="var(--border-strong)" stroke-width="1"/>';
+  if (res.length > 1) svg += '<polyline points="' + pts + '" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/>';
+  res.forEach((r, i) => {
+    const fill = r > 1 ? "var(--yellow)" : r < -1 ? "var(--accent)" : "var(--text-mute)";
+    svg += '<circle cx="' + toX(i) + '" cy="' + toY(r) + '" r="3" fill="' + fill + '"/>';
+    svg += '<text x="' + toX(i) + '" y="' + (toY(r) - 5) + '" fill="var(--text-dim)" font-size="8" text-anchor="middle">G' + (i + 1) + '</text>';
+  });
+  if (correction != null) {
+    const cY = toY(correction);
+    svg += '<line x1="' + pad + '" y1="' + cY + '" x2="' + (W - pad) + '" y2="' + cY + '" stroke="var(--yellow)" stroke-width="1" stroke-dasharray="4,3"/>';
+  }
+  svg += '</svg>';
+  return svg;
+}
+
+function renderResults() {
+  const root = document.getElementById("results-view");
+  root.innerHTML = "";
+  const gameLog         = PREDICTIONS.game_log        || [];
+  const seriesResiduals = PREDICTIONS.series_residuals || {};
+  const lineMovement    = PREDICTIONS.line_movement    || {};
+
+  // ── Version filter ────────────────────────────────────────────────────────
+  const versions = [...new Set(gameLog.map(g => g.model_version).filter(Boolean))].sort();
+  const filterBar = document.createElement("div");
+  filterBar.className = "results-filter";
+  const lbl = document.createElement("label");
+  lbl.textContent = "Model version:";
+  filterBar.appendChild(lbl);
+  const sel = document.createElement("select");
+  for (const [val, text] of [["all", "All Versions"], ...versions.map(v => [v, v])]) {
+    const o = document.createElement("option");
+    o.value = val; o.textContent = text;
+    if (val === state.resultsVersion) o.selected = true;
+    sel.appendChild(o);
+  }
+  sel.addEventListener("change", e => { state.resultsVersion = e.target.value; renderResults(); });
+  filterBar.appendChild(sel);
+  root.appendChild(filterBar);
+
+  const ver = state.resultsVersion || "all";
+  const filtered = ver === "all" ? gameLog : gameLog.filter(g => g.model_version === ver);
+
+  // ── Header metrics ────────────────────────────────────────────────────────
+  const m = computeMetrics(filtered);
+  const metricRow = document.createElement("div");
+  metricRow.className = "metric-row";
+  const pickCls = m.pick.w > m.pick.l ? "pos" : m.pick.w < m.pick.l ? "neg" : "";
+  const atsCls  = m.ats.w  > m.ats.l  ? "pos" : m.ats.w  < m.ats.l  ? "neg" : "";
+  const clvCls  = m.clv.mean != null ? (m.clv.mean > 0 ? "pos" : m.clv.mean < 0 ? "neg" : "") : "";
+  for (const [label, value, sub, cls] of [
+    ["Overall (Pick'em)", m.pick.w + "–" + m.pick.l,  (m.pick.w + m.pick.l) + " decisions", pickCls],
+    ["ATS Record",  m.ats.w + "–" + m.ats.l + "–" + m.ats.p,  (m.ats.w + m.ats.l + m.ats.p) + " graded", atsCls],
+    ["O/U Record",  m.ou.o  + "–" + m.ou.u  + "–" + m.ou.p,   (m.ou.o  + m.ou.u  + m.ou.p)  + " graded", ""],
+    ["CLV (mean)",
+      m.clv.mean != null ? (m.clv.mean >= 0 ? "+" : "") + m.clv.mean.toFixed(2) + " pts" : "—",
+      m.clv.total > 0 ? m.clv.pos + "/" + m.clv.total + " positive" : "no CLV data",
+      clvCls],
+  ]) {
+    const card = document.createElement("div");
+    card.className = "metric-box " + cls;
+    card.innerHTML = '<div class="mb-label">' + label + '</div><div class="mb-value">' + value + '</div><div class="mb-sub">' + sub + '</div>';
+    metricRow.appendChild(card);
+  }
+  root.appendChild(metricRow);
+
+  // ── ATS splits ────────────────────────────────────────────────────────────
+  const grid = document.createElement("div");
+  grid.className = "splits-grid";
+
+  const homePicks  = filtered.filter(g => g.model_pick === "home");
+  const awayPicks  = filtered.filter(g => g.model_pick === "away");
+  const hm = computeMetrics(homePicks), am = computeMetrics(awayPicks);
+  const perspBox = document.createElement("div");
+  perspBox.className = "split-box";
+  perspBox.innerHTML = '<h4>ATS by Pick Perspective</h4>' +
+    '<div class="split-row"><span class="sr-label">Home picks</span><span class="sr-val">' + hm.ats.w + "–" + hm.ats.l + "–" + hm.ats.p + '</span></div>' +
+    '<div class="split-row"><span class="sr-label">Away picks</span><span class="sr-val">' + am.ats.w + "–" + am.ats.l + "–" + am.ats.p + '</span></div>';
+  grid.appendChild(perspBox);
+
+  const earlyGames = filtered.filter(g => (g.series_game_number || 0) <= 3 && g.series_game_number > 0);
+  const lateGames  = filtered.filter(g => (g.series_game_number || 0) >= 4);
+  const em = computeMetrics(earlyGames), lm2 = computeMetrics(lateGames);
+  const tierBox = document.createElement("div");
+  tierBox.className = "split-box";
+  tierBox.innerHTML = '<h4>ATS by Series Game Tier</h4>' +
+    '<div class="split-row"><span class="sr-label">Games 1–3</span><span class="sr-val">' + em.ats.w + "–" + em.ats.l + "–" + em.ats.p + '</span></div>' +
+    '<div class="split-row"><span class="sr-label">Games 4–7</span><span class="sr-val">' + lm2.ats.w + "–" + lm2.ats.l + "–" + lm2.ats.p + '</span></div>';
+  grid.appendChild(tierBox);
+  root.appendChild(grid);
+
+  // ── Series performance table ───────────────────────────────────────────────
+  const seriesSection = document.createElement("div");
+  seriesSection.className = "results-section";
+  seriesSection.innerHTML = '<h3>Series Performance</h3>';
+  const seriesSummary = buildSeriesSummary(filtered);
+  if (!seriesSummary.length) {
+    seriesSection.innerHTML += '<p class="results-empty">No completed series games yet.</p>';
+  } else {
+    const st = document.createElement("table");
+    st.className = "results-table";
+    st.innerHTML = '<thead><tr><th>Series</th><th>Predicted</th><th>Actual</th><th>Played</th><th>Pick</th><th>ATS</th><th>O/U</th></tr></thead>';
+    const stb = document.createElement("tbody");
+    for (const s of seriesSummary) {
+      const tr = document.createElement("tr");
+      tr.innerHTML =
+        '<td>' + s.label + '</td><td class="mono">' + s.predicted + '</td>' +
+        '<td class="mono">' + s.actual + '</td><td class="mono">' + s.played + '</td>' +
+        '<td class="mono">' + s.pick + '</td><td class="mono">' + s.ats + '</td>' +
+        '<td class="mono">' + s.ou + '</td>';
+      stb.appendChild(tr);
+    }
+    st.appendChild(stb);
+    seriesSection.appendChild(st);
+  }
+  root.appendChild(seriesSection);
+
+  // ── Game log ──────────────────────────────────────────────────────────────
+  const logSection = document.createElement("div");
+  logSection.className = "results-section";
+  logSection.innerHTML = '<h3>Game-by-Game Log</h3>';
+  if (!filtered.length) {
+    logSection.innerHTML += '<p class="results-empty">No completed games to display.</p>';
+  } else {
+    const lt = document.createElement("table");
+    lt.className = "results-table";
+    lt.innerHTML =
+      '<thead><tr><th>Date</th><th>Matchup</th><th>G#</th><th>Pick</th>' +
+      '<th>Base</th><th>Adj</th><th>Result</th><th>ATS</th><th>O/U</th></tr></thead>';
+    const ltb = document.createElement("tbody");
+    for (const g of filtered) {
+      const pickTeam = g.model_pick === "home" ? g.home_team : g.away_team;
+      const result = (g.home_score != null && g.away_score != null)
+        ? g.home_team + " " + g.home_score + "–" + g.away_score + " " + g.away_team : "—";
+      const atsCell = g.ats_result === "cover" ? '<span class="ats-cover">✓ Cover</span>'
+                    : g.ats_result === "miss"  ? '<span class="ats-miss">✗ Miss</span>'
+                    : g.ats_result === "push"  ? '<span class="ats-push">Push</span>' : "—";
+      const ouCell  = g.ou_result  === "over"  ? '<span class="ou-over">Over</span>'
+                    : g.ou_result  === "under" ? '<span class="ou-under">Under</span>'
+                    : g.ou_result  === "push"  ? '<span class="ou-push">Push</span>' : "—";
+      const tr = document.createElement("tr");
+      tr.innerHTML =
+        '<td class="mono">' + (g.game_date || "").slice(5) + '</td>' +
+        '<td>' + g.away_team + " @ " + g.home_team + '</td>' +
+        '<td class="mono">' + (g.series_game_number ? "G" + g.series_game_number : "—") + '</td>' +
+        '<td class="mono">' + pickTeam + '</td>' +
+        '<td class="mono">' + (g.predicted_spread_base != null ? fmtSpread(g.predicted_spread_base) : "—") + '</td>' +
+        '<td class="mono">' + (g.predicted_spread_adjusted != null ? fmtSpread(g.predicted_spread_adjusted) : "") + '</td>' +
+        '<td>' + result + '</td>' +
+        '<td>' + atsCell + '</td>' +
+        '<td>' + ouCell + '</td>';
+      ltb.appendChild(tr);
+    }
+    lt.appendChild(ltb);
+    logSection.appendChild(lt);
+  }
+  root.appendChild(logSection);
+
+  // ── Residual charts ───────────────────────────────────────────────────────
+  const residSection = document.createElement("div");
+  residSection.className = "results-section";
+  residSection.innerHTML = '<h3>Base Residual Trend by Series</h3>';
+  const residEntries = Object.values(seriesResiduals).filter(s => s.games && s.games.length);
+  if (!residEntries.length) {
+    residSection.innerHTML += '<p class="results-empty">No series residual data yet.</p>';
+  } else {
+    const wrap = document.createElement("div");
+    for (const sd of residEntries) {
+      const item = document.createElement("div");
+      item.className = "res-chart-item";
+      const seriesLabel = (sd.series_id || "").split("_")[0].replace("|", " vs ");
+      const corrNote = sd.active_correction != null
+        ? "Series adjustment active: " + (sd.active_correction >= 0 ? "+" : "") + sd.active_correction.toFixed(2) + " pts"
+        : null;
+      const dirNote = sd.mean_residual != null
+        ? (sd.mean_residual > 0 ? "Consistent overestimation" : "Consistent underestimation") +
+          " of home margin (mean " + (sd.mean_residual >= 0 ? "+" : "") + sd.mean_residual.toFixed(2) + " pts)"
+        : "";
+      item.innerHTML =
+        '<div class="res-chart-label">' + seriesLabel + '</div>' +
+        (dirNote ? '<div style="font-size:11px;color:var(--text-mute);margin-bottom:6px">' + dirNote + '</div>' : '') +
+        residualSparkline(sd) +
+        (corrNote ? '<div class="res-correction-note">' + corrNote + '</div>' : '');
+      wrap.appendChild(item);
+    }
+    residSection.appendChild(wrap);
+  }
+  root.appendChild(residSection);
+
+  // ── Line movement ─────────────────────────────────────────────────────────
+  const lmSection = document.createElement("div");
+  lmSection.className = "results-section";
+  lmSection.innerHTML = '<h3>Line Movement & CLV</h3>';
+  const logByGameId = {};
+  for (const g of gameLog) logByGameId[g.game_id] = g;
+  const lmEntries = Object.values(lineMovement);
+  const completedLm = lmEntries.filter(lm => logByGameId[lm.game_id]);
+
+  if (!completedLm.length) {
+    lmSection.innerHTML += '<p class="results-empty">No market odds data for completed games yet.</p>';
+  } else {
+    for (const lm of completedLm) {
+      const logEntry = logByGameId[lm.game_id];
+      const item = document.createElement("div");
+      item.className = "lm-game";
+      item.innerHTML = '<div class="lm-title">' + lm.away_team + " @ " + lm.home_team + ' (' + (logEntry.game_date || "") + ')</div>';
+
+      // Group pulls by window; take first pull per window
+      const byWindow = {};
+      for (const p of lm.pulls) {
+        if (!byWindow[p.pull_window]) byWindow[p.pull_window] = p;
+      }
+
+      const tbl = document.createElement("table");
+      tbl.className = "lm-table";
+      tbl.innerHTML = '<thead><tr><th>Source</th><th>Spread</th><th>Total</th></tr></thead>';
+      const tb = document.createElement("tbody");
+      for (const win of ["morning", "midday", "evening"]) {
+        if (!byWindow[win]) continue;
+        const p = byWindow[win];
+        const tr = document.createElement("tr");
+        tr.innerHTML = '<td>' + win.charAt(0).toUpperCase() + win.slice(1) + ' line</td>' +
+          '<td>' + (p.market_spread != null ? fmtSpread(p.market_spread) : "—") + '</td>' +
+          '<td>' + (p.market_total != null ? p.market_total.toFixed(1) : "—") + '</td>';
+        tb.appendChild(tr);
+      }
+      // Model row
+      const modelRow = document.createElement("tr");
+      modelRow.className = "model-row";
+      const modelClv = logEntry ? logEntry.clv : null;
+      modelRow.innerHTML = '<td>Model spread</td>' +
+        '<td>' + (logEntry && logEntry.predicted_spread_base != null ? fmtSpread(logEntry.predicted_spread_base) : "—") + '</td>' +
+        '<td>' + (modelClv != null ? "CLV " + (modelClv >= 0 ? "+" : "") + modelClv.toFixed(2) : "—") + '</td>';
+      tb.appendChild(modelRow);
+      tbl.appendChild(tb);
+      item.appendChild(tbl);
+      lmSection.appendChild(item);
+    }
+  }
+
+  const caveat = document.createElement("p");
+  caveat.className = "lm-note";
+  caveat.textContent = "Opening line reflects first pull of the day (~9 AM), not the true overnight market open. Evening line is a single 7 PM local-time pull, not a per-game closing line.";
+  lmSection.appendChild(caveat);
+  root.appendChild(lmSection);
+}
+
 // ========== Today view ==========
 function computeStaleness() {
   const gen = new Date(PREDICTIONS.generated_at);
@@ -1307,6 +1689,7 @@ fetch('data.json')
     renderToday();
     renderBracket();
     renderGame();
+    renderResults();
     renderDetail();
     renderBacktest();
     renderModelInfo();
