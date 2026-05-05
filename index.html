@@ -190,18 +190,28 @@
 
   /* Mobile tweaks */
   @media (max-width: 480px) {
-    main { padding: 12px; }
-    header { padding: 12px 14px 6px; }
-    header h1 { font-size: 16px; }
+    main { padding: 10px; }
+    header { padding: 10px 12px 6px; }
+    header h1 { font-size: 15px; }
+    nav.tabs button { font-size: 13px; padding: 10px 10px; min-height: 44px; }
     .slot-card { padding: 10px 12px; }
     .slot-card .team-name { font-size: 14px; }
     .slot-card .team-prob { font-size: 13px; }
+    .slot-card .team-row { min-height: 40px; }
     .detail-header h2 { font-size: 17px; }
     .win-bar { grid-template-columns: 90px 1fr 50px; gap: 8px; }
     .length-row { grid-template-columns: 50px 1fr 50px; gap: 8px; }
     table.per-game { font-size: 11px; }
     table.per-game td, table.per-game th { padding: 5px 4px; }
     .metric-card .value { font-size: 20px; }
+    .today-card { padding: 12px 14px; }
+    .today-grid { gap: 10px 14px; }
+    .game-base-pred { gap: 16px; }
+    img.tl-sm { width: 18px; height: 18px; }
+    img.tl-md { width: 24px; height: 24px; }
+    img.tl-lg { width: 34px; height: 34px; }
+    .cmp-table th, .cmp-table td { padding: 6px 5px; font-size: 12px; }
+    .stat-table th, .stat-table td { padding: 6px 5px; font-size: 11px; }
   }
 
   /* === Today view === */
@@ -263,11 +273,21 @@
   .inj-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
   .inj-item:last-child { border-bottom: none; }
   .inj-item .inj-icon { flex-shrink: 0; }
-  .stat-legend { display: flex; gap: 16px; font-size: 11px; color: var(--text-dim); margin-bottom: 10px; }
-  .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+  .stat-legend { display: flex; gap: 6px; font-size: 11px; color: var(--text-dim); margin-bottom: 10px; flex-wrap: wrap; }
+  .stat-legend span { display: flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 10px; background: var(--bg-elev); border: 1px solid var(--border); white-space: nowrap; }
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
   .legend-green  { background: var(--green); }
   .legend-yellow { background: var(--yellow); }
   .legend-red    { background: var(--red); }
+
+  /* === Team logos === */
+  img.tl { border-radius: 50%; object-fit: contain; background: var(--bg-elev); flex-shrink: 0; vertical-align: middle; display: inline-block; }
+  img.tl-sm { width: 20px; height: 20px; }
+  img.tl-md { width: 28px; height: 28px; }
+  img.tl-lg { width: 40px; height: 40px; }
+  /* Bracket row — logo replaces swatch */
+  .slot-card .team-logo-wrap { width: 22px; height: 22px; border-radius: 50%; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--bg-elev); }
+  .slot-card .team-logo-wrap img { width: 100%; height: 100%; object-fit: contain; }
   .stat-table { width: 100%; border-collapse: collapse; font-size: 12px; }
   .stat-table th { text-align: left; color: var(--text-mute); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 8px; border-bottom: 1px solid var(--border); }
   .stat-table td { padding: 7px 8px; border-bottom: 1px solid var(--border); font-family: "SF Mono", Menlo, monospace; }
@@ -404,6 +424,37 @@ function teamColor(abbr, which = "primary") {
   return (TEAM_COLORS[abbr] || { primary: "#888", secondary: "#555" })[which];
 }
 
+// ESPN CDN logo URLs — abbreviation overrides for non-standard ESPN slugs.
+const _ESPN_CDN = "https://a.espncdn.com/i/teamlogos/nba/500/";
+const TEAM_LOGO_URLS = (() => {
+  const m = {};
+  for (const abbr of Object.keys(TEAM_COLORS)) m[abbr] = _ESPN_CDN + abbr.toLowerCase() + ".png";
+  Object.assign(m, {
+    GSW: _ESPN_CDN + "gs.png",
+    NOP: _ESPN_CDN + "no.png",
+    NYK: _ESPN_CDN + "ny.png",
+    SAS: _ESPN_CDN + "sa.png",
+    UTA: _ESPN_CDN + "utah.png",
+    WAS: _ESPN_CDN + "wsh.png",
+  });
+  return m;
+})();
+
+function teamLogoEl(abbr, sizeClass) {
+  // sizeClass: "tl-sm" | "tl-md" | "tl-lg"
+  const img = document.createElement("img");
+  img.src  = TEAM_LOGO_URLS[abbr] || "";
+  img.alt  = abbr;
+  img.className = "tl " + (sizeClass || "tl-md");
+  img.onerror = function() {
+    const px = this.className.includes("tl-sm") ? 20 : this.className.includes("tl-lg") ? 40 : 28;
+    const fb = document.createElement("span");
+    fb.style.cssText = "display:inline-block;width:" + px + "px;height:" + px + "px;border-radius:50%;background:" + teamColor(abbr) + ";flex-shrink:0;vertical-align:middle;";
+    if (this.parentNode) this.parentNode.replaceChild(fb, this);
+  };
+  return img;
+}
+
 // ========== Stat table config (tune thresholds here post-launch) ==========
 // Each row: label, homeKey/awayKey into team_stats, better=higher|lower|neutral,
 // fmt=pct|r2|r1|int, th={g,y} = green/yellow threshold on the diff.
@@ -501,6 +552,10 @@ function renderSlotCard(slot) {
   const probHigher = sr ? sr.p_higher_wins_series : 0.5;
   card.classList.add(confidenceClass(probHigher));
 
+  // Team color top accent for winner identity
+  const projectedWinner = sr ? (probHigher >= 0.5 ? sr.higher_abbr : sr.lower_abbr) : pick.a;
+  card.style.borderTop = "2px solid " + teamColor(projectedWinner);
+
   // Header: slot id label
   const idRow = document.createElement("div");
   idRow.className = "slot-id";
@@ -527,10 +582,11 @@ function renderSlotCard(slot) {
     const left = document.createElement("div");
     left.className = "team-left";
 
-    const swatch = document.createElement("div");
-    swatch.className = "team-swatch";
-    swatch.style.background = teamColor(info.abbr);
-    left.appendChild(swatch);
+    // Logo replaces swatch
+    const logoWrap = document.createElement("div");
+    logoWrap.className = "team-logo-wrap";
+    logoWrap.appendChild(teamLogoEl(info.abbr, "tl-sm"));
+    left.appendChild(logoWrap);
 
     const name = document.createElement("span");
     name.className = "team-name";
@@ -1615,28 +1671,45 @@ function renderToday() {
 }
 
 function buildTodayCard(game) {
-  const homeAbbr = game.home_team;
-  const awayAbbr = game.away_team;
-  const winProb  = game.win_prob_base;
+  const homeAbbr  = game.home_team;
+  const awayAbbr  = game.away_team;
+  const winProb   = game.win_prob_base;
   const hasInjury = game.home_star_out || game.away_star_out;
 
-  // Confidence band — based on predicted winner's probability
-  let band = "band-red";
-  if (!hasInjury && winProb != null) {
-    const conf = Math.max(winProb, 1 - winProb);
-    if (conf >= 0.65) band = "band-green";
-    else if (conf >= 0.55) band = "band-yellow";
-  }
+  // Predicted winner determined up front (needed for border color)
+  const winnerAbbr = game.predicted_winner === "home" ? homeAbbr : awayAbbr;
 
   const card = document.createElement("div");
-  card.className = "today-card " + band;
+  card.className = "today-card";
+  // Left border: predicted winner's team color
+  card.style.borderLeft  = "4px solid " + teamColor(winnerAbbr);
+  card.style.paddingLeft = "12px";
+  // Injury or low-confidence: add a faint red overlay via box-shadow
+  if (hasInjury) {
+    card.style.boxShadow = "inset 0 0 0 1px rgba(231,76,60,0.25), var(--shadow)";
+  }
 
-  // Teams header
+  // Teams header — logos + abbreviations
   const teamsEl = document.createElement("div");
   teamsEl.className = "today-teams";
-  const hDot = '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + teamColor(homeAbbr) + ';margin-right:4px;vertical-align:middle"></span>';
-  const aDot = '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + teamColor(awayAbbr) + ';margin-right:4px;vertical-align:middle"></span>';
-  teamsEl.innerHTML = hDot + homeAbbr + ' <span style="color:var(--text-mute);font-weight:400;margin:0 4px">vs</span>' + aDot + awayAbbr;
+  teamsEl.style.display = "flex";
+  teamsEl.style.alignItems = "center";
+  teamsEl.style.gap = "6px";
+  teamsEl.style.flexWrap = "wrap";
+
+  const hLogo = teamLogoEl(homeAbbr, "tl-sm");
+  teamsEl.appendChild(hLogo);
+  teamsEl.appendChild(document.createTextNode(homeAbbr));
+
+  const vsEl = document.createElement("span");
+  vsEl.style.cssText = "color:var(--text-mute);font-weight:400;font-size:13px;margin:0 2px";
+  vsEl.textContent = "vs";
+  teamsEl.appendChild(vsEl);
+
+  const aLogo = teamLogoEl(awayAbbr, "tl-sm");
+  teamsEl.appendChild(aLogo);
+  teamsEl.appendChild(document.createTextNode(awayAbbr));
+
   card.appendChild(teamsEl);
 
   // Series context
@@ -1656,7 +1729,7 @@ function buildTodayCard(game) {
   grid.className = "today-grid";
 
   // Cell: Predicted Winner
-  const winnerAbbr = game.predicted_winner === "home" ? homeAbbr : awayAbbr;
+  // winnerAbbr already computed at top of function
   const winnerProb = winProb != null
     ? (game.predicted_winner === "home" ? winProb : 1 - winProb)
     : null;
@@ -1797,12 +1870,34 @@ function renderGame() {
   const hdrSection = document.createElement("div");
   hdrSection.className = "cmp-section";
 
-  const hDot = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + teamColor(homeAbbr) + ';margin-right:5px;vertical-align:middle"></span>';
-  const aDot = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + teamColor(awayAbbr) + ';margin-right:5px;vertical-align:middle"></span>';
   const matchupEl = document.createElement("div");
   matchupEl.className = "game-matchup";
-  matchupEl.innerHTML = hDot + (teamName(homeAbbr) || homeAbbr) +
-    '<span style="color:var(--text-mute);font-weight:400"> vs </span>' + aDot + (teamName(awayAbbr) || awayAbbr);
+  matchupEl.style.display = "flex";
+  matchupEl.style.alignItems = "center";
+  matchupEl.style.gap = "8px";
+  matchupEl.style.flexWrap = "wrap";
+
+  const hTeamSpan = document.createElement("span");
+  hTeamSpan.style.display = "flex";
+  hTeamSpan.style.alignItems = "center";
+  hTeamSpan.style.gap = "6px";
+  hTeamSpan.appendChild(teamLogoEl(homeAbbr, "tl-md"));
+  hTeamSpan.appendChild(document.createTextNode(teamName(homeAbbr) || homeAbbr));
+
+  const vsSpan2 = document.createElement("span");
+  vsSpan2.style.cssText = "color:var(--text-mute);font-weight:400;font-size:16px";
+  vsSpan2.textContent = "vs";
+
+  const aTeamSpan = document.createElement("span");
+  aTeamSpan.style.display = "flex";
+  aTeamSpan.style.alignItems = "center";
+  aTeamSpan.style.gap = "6px";
+  aTeamSpan.appendChild(teamLogoEl(awayAbbr, "tl-md"));
+  aTeamSpan.appendChild(document.createTextNode(teamName(awayAbbr) || awayAbbr));
+
+  matchupEl.appendChild(hTeamSpan);
+  matchupEl.appendChild(vsSpan2);
+  matchupEl.appendChild(aTeamSpan);
   hdrSection.appendChild(matchupEl);
 
   const ctxEl = document.createElement("div");
@@ -1993,7 +2088,10 @@ function renderGame() {
   const statTbl = document.createElement("table");
   statTbl.className = "stat-table";
   statTbl.innerHTML =
-    '<thead><tr><th>Metric</th><th>' + homeAbbr + ' (home)</th><th>' + awayAbbr + ' (away)</th></tr></thead>';
+    '<thead><tr><th>Metric</th>' +
+    '<th style="color:' + teamColor(homeAbbr) + '">' + homeAbbr + ' (home)</th>' +
+    '<th style="color:' + teamColor(awayAbbr) + '">' + awayAbbr + ' (away)</th>' +
+    '</tr></thead>';
   const statTb = document.createElement("tbody");
 
   for (const row of STAT_ROWS) {
