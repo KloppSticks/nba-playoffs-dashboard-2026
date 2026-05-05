@@ -1,25 +1,49 @@
 # NBA Playoffs 2026 — Prediction Dashboard
 
-Self-contained HTML dashboard for the 2026 NBA playoffs, auto-generated from a
-private predictive model. Hosted on GitHub Pages so it renders on any device
-(Mac, iPhone, anything with a modern browser).
+A daily-updating prediction dashboard for the 2026 NBA Playoffs. Powered by a private predictive model that ingests game data, trains scikit-learn models, runs Monte Carlo series simulations, and pulls market consensus odds. Published to GitHub Pages automatically every morning.
 
 **Live:** https://kloppsticks.github.io/nba-playoffs-dashboard-2026/
 
-This repo only holds the rendered dashboard (`index.html`). The model code,
-training data, and simulation engine live in a separate private repository
-and are not published here. Predictions are rebuilt locally and pushed here
-whenever fresh model output is available.
+This repo holds only the rendered dashboard output (`index.html` + `data.json`). The model code, training data, and simulation engine live in a separate private repository and are not published here. Predictions are rebuilt locally and pushed here whenever fresh model output is available.
 
-## What you'll see
+---
 
-- **Bracket** — all 8 Round 1 matchups with probabilities. Round 2+ slots show
-  dropdowns that let you pick your own path through the bracket and see the
-  model's probability for each resulting series.
-- **Series Detail** — tap any matchup for Monte Carlo distributions, per-game
-  predictions (spread + total), and a winner × length joint table.
-- **Backtest** — model performance on the 2023-24 and 2024-25 playoffs.
-- **Model Info** — training metadata and known limitations.
+## Dashboard Tabs
 
-Everything is client-side JavaScript reading an embedded JSON blob — no network
-calls, no tracking.
+| Tab | Content |
+|-----|---------|
+| **Today** | Today's games — predicted winner, spread, total, market consensus line, Model Edge badge |
+| **Bracket** | Full bracket with series win probabilities; interactive dropdowns for Round 2+ |
+| **Game Detail** | Full analysis for a selected game: model vs. market, series correction, stat comparison |
+| **Results** | ATS/O-U record, CLV tracking, game-by-game log, residual trend charts |
+| **Series Detail** | Monte Carlo breakdown: win probabilities, length distribution, per-game predictions |
+| **Backtest** | Gate verdict and per-season metrics on 2023-24 and 2024-25 held-out playoffs |
+| **Model Info** | Version, feature importances, active injury overrides, active series corrections |
+
+---
+
+## How It Works
+
+The dashboard is a static HTML shell (`index.html`) that loads prediction data at runtime via `fetch('data.json')`. Both files must be served from the same directory — GitHub Pages handles this automatically.
+
+**Note:** Opening `index.html` directly from your filesystem (`file://`) will not work — browsers block the `fetch()` call for local files. Use the live GitHub Pages URL, or serve locally with `python -m http.server 8000` from this directory.
+
+The model behind the dashboard:
+- Ingests 5 seasons of NBA game data from `stats.nba.com`
+- Engineers a 24-feature differential vector per matchup
+- Trains three scikit-learn models (winner classifier + spread/total regressors) with playoff-weighted training
+- Runs 10,000 Monte Carlo simulations per series under the 2-2-1-1-1 home-court schedule
+- Applies a Bayesian residual correction layer for in-progress series
+- Pulls market consensus lines from DraftKings, FanDuel, BetMGM, and Caesars (median)
+
+Backtest accuracy: **64.5%** on 166 held-out playoff games (2023-24 + 2024-25), vs. 58.4% higher-seed baseline.
+
+---
+
+## Limitations
+
+- Linear models only (LogisticRegression + LinearRegression)
+- Injury input is manual — no live feed
+- Series simulation treats games as independent (no momentum)
+- Backtest sample is ~166 games — error bars are wide
+- Predictions are for educational and personal-research purposes only. Not financial or gambling advice.
