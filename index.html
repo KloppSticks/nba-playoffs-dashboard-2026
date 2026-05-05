@@ -499,6 +499,13 @@ function seriesResult(abbrA, abbrB) {
   return PREDICTIONS.series_results[k1] || PREDICTIONS.series_results[k2] || null;
 }
 function winnerOf(abbrA, abbrB) {
+  const decided = PREDICTIONS.bracket_slots.find(s =>
+    s.actual_winner && (
+      (s.default_a === abbrA && s.default_b === abbrB) ||
+      (s.default_a === abbrB && s.default_b === abbrA)
+    )
+  );
+  if (decided) return decided.actual_winner;
   const sr = seriesResult(abbrA, abbrB);
   if (!sr) return abbrA;
   return sr.p_higher_wins_series >= 0.5 ? sr.higher_abbr : sr.lower_abbr;
@@ -546,26 +553,29 @@ function confidenceClass(p) {
 function renderSlotCard(slot) {
   const pick = state.picks[slot.id];
   const sr = seriesResult(pick.a, pick.b);
+  const actualWinner = slot.actual_winner || null;
+  const seriesRecord = slot.series_record || null;
+  const isFinal = !!actualWinner;
 
   const card = document.createElement("div");
   card.className = "slot-card";
   card.dataset.slotId = slot.id;
 
   const probHigher = sr ? sr.p_higher_wins_series : 0.5;
-  card.classList.add(confidenceClass(probHigher));
+  card.classList.add(isFinal ? "conf-high" : confidenceClass(probHigher));
 
-  // Team color top accent for winner identity
-  const projectedWinner = sr ? (probHigher >= 0.5 ? sr.higher_abbr : sr.lower_abbr) : pick.a;
-  card.style.borderTop = "2px solid " + teamColor(projectedWinner);
+  // Team color top accent — use actual winner when decided
+  const topTeam = actualWinner || (sr ? (probHigher >= 0.5 ? sr.higher_abbr : sr.lower_abbr) : pick.a);
+  card.style.borderTop = "2px solid " + teamColor(topTeam);
 
   // Header: slot id label
   const idRow = document.createElement("div");
   idRow.className = "slot-id";
-  idRow.textContent = slot.id.replace(/-/g, " · ");
+  idRow.textContent = slot.id.replace(/-/g, " · ") + (isFinal ? " · FINAL" : "");
   card.appendChild(idRow);
 
   const teamAbbrs = sr ? [sr.higher_abbr, sr.lower_abbr] : [pick.a, pick.b];
-  const winnerAbbr = sr ? winnerOf(pick.a, pick.b) : pick.a;
+  const winnerAbbr = isFinal ? actualWinner : (sr ? winnerOf(pick.a, pick.b) : pick.a);
 
   // For each side (higher seed first): team name, selector (if R2+), prob
   const sidesInfo = [
@@ -607,14 +617,18 @@ function renderSlotCard(slot) {
 
     const prob = document.createElement("span");
     prob.className = "team-prob";
-    prob.textContent = fmtPct(info.prob);
+    if (isFinal) {
+      prob.textContent = info.abbr === actualWinner ? seriesRecord : "";
+    } else {
+      prob.textContent = fmtPct(info.prob);
+    }
     row.appendChild(prob);
 
     card.appendChild(row);
   }
 
-  // Selectors for R2+ slots: one <select> per side, showing the candidates from its feeder.
-  if (slot.round > 1) {
+  // Selectors for R2+ slots that are not yet decided
+  if (slot.round > 1 && !isFinal) {
     const selRow = document.createElement("div");
     selRow.className = "meta-row";
     selRow.style.flexDirection = "column";
@@ -656,13 +670,19 @@ function renderSlotCard(slot) {
     card.appendChild(selRow);
   }
 
-  // Expected series length footer
-  if (sr) {
-    const meta = document.createElement("div");
-    meta.className = "meta-row";
+  // Footer: "FINAL 4-3" for decided series, expected length for live/upcoming
+  const meta = document.createElement("div");
+  meta.className = "meta-row";
+  if (isFinal) {
+    meta.innerHTML =
+      '<span style="color:var(--fav)">Series Final: ' + seriesRecord + '</span>' +
+      '<span style="color:var(--text-mute);">tap for detail →</span>';
+    card.appendChild(meta);
+  } else if (sr) {
     meta.innerHTML =
       '<span>Exp. length: ' + sr.expected_length.toFixed(1) + ' games</span>' +
-      '<span style="color: var(--text-mute);">tap for detail →</span>';
+      (seriesRecord ? '<span style="color:var(--accent)">Series: ' + seriesRecord + '</span>' : '') +
+      '<span style="color:var(--text-mute);">tap for detail →</span>';
     card.appendChild(meta);
   }
 
