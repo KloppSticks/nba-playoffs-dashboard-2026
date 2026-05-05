@@ -137,6 +137,57 @@
   ul.limitations { padding-left: 20px; color: var(--text-dim); font-size: 13px; line-height: 1.6; }
   ul.limitations li { margin-bottom: 6px; }
 
+  .mi-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }
+  .mi-section h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); margin-bottom: 12px; }
+  .mi-version-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 0; }
+  .mi-ver-card { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+  .mi-ver-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-mute); margin-bottom: 4px; }
+  .mi-ver-val { font-size: 15px; font-weight: 600; font-family: "SF Mono", Menlo, monospace; }
+
+  .fi-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .fi-bar-row:last-child { margin-bottom: 0; }
+  .fi-rank { width: 20px; text-align: right; font-size: 11px; color: var(--text-mute); flex-shrink: 0; }
+  .fi-name { width: 180px; font-size: 12px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+  @media (max-width: 480px) { .fi-name { width: 120px; } }
+  .fi-track { flex: 1; height: 10px; background: var(--bg-elev); border-radius: 3px; overflow: hidden; min-width: 60px; }
+  .fi-fill  { height: 100%; border-radius: 3px; transition: width 0.3s; }
+  .fi-fill.pos { background: var(--fav); }
+  .fi-fill.neg { background: var(--dog); }
+  .fi-coef  { width: 50px; text-align: right; font-size: 11px; font-family: "SF Mono", Menlo, monospace; color: var(--text-dim); flex-shrink: 0; }
+
+  .override-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .override-item:last-child { border-bottom: none; }
+  .override-none { font-size: 13px; color: var(--text-mute); font-style: italic; }
+  .oi-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .oi-dot.inj { background: var(--yellow); }
+  .oi-dot.ser { background: var(--accent); }
+
+  .local-panel { background: var(--bg-elev); border: 1px solid var(--border-strong); border-radius: 8px; padding: 14px 16px; }
+  .local-note  { font-size: 12px; color: var(--text-mute); margin-bottom: 12px; }
+  .local-action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .local-btn { padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border-strong); background: var(--bg-card); color: var(--text); font-size: 13px; font-family: inherit; cursor: pointer; transition: background 0.15s, border-color 0.15s; min-height: 36px; }
+  .local-btn:hover { background: var(--bg-elev); border-color: var(--accent); color: var(--accent); }
+  .local-btn.primary { background: rgba(74,144,226,0.15); border-color: var(--accent); color: var(--accent); }
+  .local-btn.primary:hover { background: rgba(74,144,226,0.25); }
+  .local-status { font-size: 12px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); margin-top: 8px; display: none; }
+  .local-status.ok   { color: var(--green); border-color: rgba(56,193,114,0.3); background: rgba(56,193,114,0.07); display: block; }
+  .local-status.warn { color: var(--yellow); border-color: rgba(242,201,76,0.3); background: rgba(242,201,76,0.07); display: block; }
+  .local-status.err  { color: var(--red); border-color: rgba(231,76,60,0.3); background: rgba(231,76,60,0.07); display: block; }
+
+  .inj-form { margin-top: 12px; }
+  .inj-form-row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 8px; }
+  .inj-form-row label { display: block; font-size: 11px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .inj-form-row input, .inj-form-row select { background: var(--bg-elev); color: var(--text); border: 1px solid var(--border-strong); border-radius: 5px; padding: 6px 10px; font-size: 13px; font-family: inherit; min-height: 36px; }
+  .inj-form-row input { width: 180px; }
+  .inj-form-row select { min-width: 140px; }
+  .inj-form-row input:focus, .inj-form-row select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .pending-list { margin: 10px 0; }
+  .pending-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 10px; background: var(--bg-elev); border: 1px solid var(--border); border-radius: 5px; margin-bottom: 6px; font-size: 12px; }
+  .pending-item .pi-info { flex: 1; }
+  .pending-item .pi-remove { background: none; border: none; color: var(--text-mute); cursor: pointer; font-size: 14px; padding: 0 4px; line-height: 1; }
+  .pending-item .pi-remove:hover { color: var(--red); }
+  .local-offline { font-size: 13px; color: var(--text-mute); font-style: italic; padding: 12px 0; }
+
   /* Mobile tweaks */
   @media (max-width: 480px) {
     main { padding: 12px; }
@@ -860,37 +911,326 @@ function renderBacktest() {
 }
 
 // ========== Model info view ==========
+// ========== Local mode detection ==========
+const isLocalMode = (
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1" ||
+  window.location.hostname === ""
+);
+const LOCAL_SERVER = "http://localhost:5001";
+
+// ========== Model info view ==========
 function renderModelInfo() {
   const root = document.getElementById("model-view");
   root.innerHTML = "";
-  const mi = PREDICTIONS.model_info;
+  const mm = PREDICTIONS.model_metadata || {};
+  const mi = PREDICTIONS.model_info || {};
+  const ao = PREDICTIONS.active_overrides || { injuries: [], series_corrections: [] };
 
-  const grid = document.createElement("div");
-  grid.className = "metric-grid";
-  grid.innerHTML =
-    '<div class="metric-card"><div class="label">Training Rows</div><div class="value">' + mi.training_rows.toLocaleString() + '</div></div>' +
-    '<div class="metric-card"><div class="label">In-Sample Accuracy</div><div class="value">' + fmtPct(mi.in_sample_accuracy) + '</div><div class="sub">not evaluation — see Backtest</div></div>' +
-    '<div class="metric-card"><div class="label">In-Sample Log Loss</div><div class="value">' + mi.in_sample_log_loss.toFixed(3) + '</div></div>' +
-    '<div class="metric-card"><div class="label">Last Trained</div><div class="value" style="font-size:14px;">' + mi.last_trained.slice(0,16).replace("T"," ") + '</div><div class="sub">UTC</div></div>';
-  root.appendChild(grid);
+  // ── Section 1: Version cards ─────────────────────────────────────────────
+  const verSec = document.createElement("div");
+  verSec.className = "mi-section";
+  verSec.innerHTML = '<h3>Model Version</h3>';
+  const verGrid = document.createElement("div");
+  verGrid.className = "mi-version-grid";
 
-  const desc = document.createElement("div");
-  desc.className = "detail-row";
-  desc.innerHTML = "<h3>Training Window</h3><p style=\"color: var(--text-dim); font-size: 13px;\">" + mi.training_window + "</p>";
-  root.appendChild(desc);
-
-  const lims = document.createElement("div");
-  lims.className = "detail-row";
-  lims.innerHTML = "<h3>Known Limitations</h3>";
-  const ul = document.createElement("ul");
-  ul.className = "limitations";
-  for (const l of mi.limitations) {
-    const li = document.createElement("li");
-    li.textContent = l;
-    ul.appendChild(li);
+  const tr = mm.training_rows || {};
+  const trainTotal = tr.total || (mi.training_rows) || "—";
+  const retrainDate = mm.retrain_date || (mi.last_trained ? mi.last_trained.slice(0,10) : "—");
+  const seasons = (mm.training_seasons || []).join(", ") || "—";
+  const verCards = [
+    { label: "Version", val: mm.version || "v2.0" },
+    { label: "Last Retrained", val: retrainDate },
+    { label: "Training Rows", val: typeof trainTotal === "number" ? trainTotal.toLocaleString() : trainTotal },
+    { label: "Seasons", val: seasons },
+  ];
+  for (const c of verCards) {
+    verGrid.innerHTML += '<div class="mi-ver-card"><div class="mi-ver-label">' + c.label + '</div><div class="mi-ver-val">' + c.val + '</div></div>';
   }
-  lims.appendChild(ul);
-  root.appendChild(lims);
+  verSec.appendChild(verGrid);
+
+  // Training row breakdown
+  if (tr.regular_season != null) {
+    const breakdown = document.createElement("p");
+    breakdown.style.cssText = "margin-top:10px;font-size:12px;color:var(--text-dim)";
+    breakdown.textContent = "Breakdown — RS: " + tr.regular_season.toLocaleString() +
+      " (×" + ((mm.training_weights || {}).regular_season || 1.0).toFixed(1) + ")" +
+      " | Playoff historical: " + (tr.playoff_historical || 0).toLocaleString() +
+      " (×" + ((mm.training_weights || {}).playoff_historical || 1.5).toFixed(1) + ")" +
+      " | Current PO: " + (tr.playoff_current || 0).toLocaleString() +
+      " (×" + ((mm.training_weights || {}).playoff_current || 2.0).toFixed(1) + ")";
+    verSec.appendChild(breakdown);
+  }
+  root.appendChild(verSec);
+
+  // ── Section 2: Feature importances ──────────────────────────────────────
+  const fiSec = document.createElement("div");
+  fiSec.className = "mi-section";
+  fiSec.innerHTML = '<h3>Feature Importances (Top 10 by |Coefficient|)</h3>';
+
+  const feats = mm.feature_importances_top10 || [];
+  if (feats.length) {
+    const maxAbs = Math.max(...feats.map(f => f.abs));
+    for (let i = 0; i < feats.length; i++) {
+      const f = feats[i];
+      const pct = maxAbs > 0 ? (f.abs / maxAbs * 100).toFixed(1) : 0;
+      const row = document.createElement("div");
+      row.className = "fi-bar-row";
+      const coefStr = (f.coefficient >= 0 ? "+" : "") + f.coefficient.toFixed(3);
+      row.innerHTML =
+        '<span class="fi-rank">' + (i + 1) + '</span>' +
+        '<span class="fi-name" title="' + f.feature + '">' + f.feature + '</span>' +
+        '<div class="fi-track"><div class="fi-fill ' + (f.coefficient >= 0 ? "pos" : "neg") + '" style="width:' + pct + '%"></div></div>' +
+        '<span class="fi-coef">' + coefStr + '</span>';
+      fiSec.appendChild(row);
+    }
+  } else {
+    fiSec.innerHTML += '<p style="color:var(--text-mute);font-size:13px;font-style:italic">Feature importance data not available.</p>';
+  }
+  root.appendChild(fiSec);
+
+  // ── Section 3: Active injury overrides ──────────────────────────────────
+  const injSec = document.createElement("div");
+  injSec.className = "mi-section";
+  injSec.innerHTML = '<h3>Active Injury Overrides</h3>';
+  const injuries = ao.injuries || [];
+  if (injuries.length) {
+    for (const inj of injuries) {
+      const item = document.createElement("div");
+      item.className = "override-item";
+      item.innerHTML = '<div class="oi-dot inj"></div><span><strong>' + inj.team + '</strong> — ' +
+        (inj.player || "player") + ' listed <strong>' + (inj.status || "Out") + '</strong></span>';
+      injSec.appendChild(item);
+    }
+  } else {
+    injSec.innerHTML += '<p class="override-none">No injury overrides active.</p>';
+  }
+  root.appendChild(injSec);
+
+  // ── Section 4: Active series corrections ─────────────────────────────────
+  const serSec = document.createElement("div");
+  serSec.className = "mi-section";
+  serSec.innerHTML = '<h3>Active Series Corrections</h3>';
+  const seriesCorr = ao.series_corrections || [];
+  if (seriesCorr.length) {
+    for (const sc of seriesCorr) {
+      const item = document.createElement("div");
+      item.className = "override-item";
+      const dir = sc.correction > 0 ? "Home +" : "Away +";
+      item.innerHTML = '<div class="oi-dot ser"></div><span><strong>' + (sc.series_id || "—") + '</strong> — ' +
+        dir + Math.abs(sc.correction).toFixed(1) + ' pts correction, ' +
+        (sc.games_used || 0) + ' game(s) used</span>';
+      serSec.appendChild(item);
+    }
+  } else {
+    serSec.innerHTML += '<p class="override-none">No series corrections active.</p>';
+  }
+  root.appendChild(serSec);
+
+  // ── Section 5: Market data source note ──────────────────────────────────
+  const mktSec = document.createElement("div");
+  mktSec.className = "mi-section";
+  mktSec.innerHTML = '<h3>Market Data Source</h3>' +
+    '<p style="font-size:13px;color:var(--text-dim);line-height:1.6">' +
+    'Consensus line sourced from DraftKings, FanDuel, BetMGM, and Caesars via The Odds API free tier (median of posted lines). ' +
+    'Spreads and totals only — moneylines not in scope for v2.0. ' +
+    'Pinnacle (sharp line) not included. ' +
+    'Lines are raw-posted (no vig removal). ' +
+    '"Morning" = first pull of the day (~9 AM), "Evening" = single 7 PM pull (not per-game closing line).</p>';
+  root.appendChild(mktSec);
+
+  // ── Section 6: Known limitations ────────────────────────────────────────
+  const limSec = document.createElement("div");
+  limSec.className = "mi-section";
+  limSec.innerHTML = '<h3>Known Limitations</h3>';
+  const lims = (mm.limitations || mi.limitations || []);
+  if (lims.length) {
+    const ul = document.createElement("ul");
+    ul.className = "limitations";
+    for (const l of lims) {
+      const li = document.createElement("li");
+      li.textContent = l;
+      ul.appendChild(li);
+    }
+    limSec.appendChild(ul);
+  }
+  root.appendChild(limSec);
+
+  // ── Section 7: Local mode panel ─────────────────────────────────────────
+  const localSec = document.createElement("div");
+  localSec.className = "mi-section";
+  localSec.innerHTML = '<h3>Local Controls</h3>';
+
+  if (!isLocalMode) {
+    const note = document.createElement("p");
+    note.className = "local-offline";
+    note.textContent = "Injury management and model refresh are available in local mode only. " +
+      "Run the dashboard locally with scripts/server.py to use these features.";
+    localSec.appendChild(note);
+    root.appendChild(localSec);
+    return;
+  }
+
+  buildLocalPanel(localSec, ao);
+  root.appendChild(localSec);
+}
+
+function buildLocalPanel(root, ao) {
+  const panel = document.createElement("div");
+  panel.className = "local-panel";
+
+  const note = document.createElement("p");
+  note.className = "local-note";
+  note.textContent = "Running locally. Injury saves trigger a pipeline refresh (~30–60 sec). Reload dashboard after refresh completes.";
+  panel.appendChild(note);
+
+  // Refresh Model button
+  const actionRow = document.createElement("div");
+  actionRow.className = "local-action-row";
+  const refreshBtn = document.createElement("button");
+  refreshBtn.className = "local-btn";
+  refreshBtn.textContent = "Refresh Model (run_daily.py --skip-train)";
+  const statusEl = document.createElement("div");
+  statusEl.className = "local-status";
+  statusEl.id = "local-status-msg";
+
+  refreshBtn.addEventListener("click", () => {
+    statusEl.className = "local-status warn";
+    statusEl.textContent = "Triggering pipeline refresh...";
+    fetch(LOCAL_SERVER + "/api/refresh", { method: "POST" })
+      .then(r => r.json())
+      .then(d => {
+        statusEl.className = "local-status ok";
+        statusEl.textContent = d.message || "Refresh triggered. Reload the dashboard in ~60 seconds.";
+      })
+      .catch(() => {
+        statusEl.className = "local-status err";
+        statusEl.textContent = "Could not connect to local server. Start it with: cd ~/nba-playoffs-model && uv run python scripts/server.py. Then reload and try again.";
+      });
+  });
+  actionRow.appendChild(refreshBtn);
+  panel.appendChild(actionRow);
+
+  // Injury management
+  const injHead = document.createElement("div");
+  injHead.style.cssText = "font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-mute);margin:14px 0 10px";
+  injHead.textContent = "Manage Injuries";
+  panel.appendChild(injHead);
+
+  const injNote = document.createElement("p");
+  injNote.style.cssText = "font-size:12px;color:var(--text-mute);margin-bottom:10px";
+  injNote.textContent = "Questionable = 0.5× net rating penalty. Out = full penalty (1.0×). Saved injuries trigger a pipeline refresh automatically.";
+  panel.appendChild(injNote);
+
+  // Mutable pending list (starts from active overrides)
+  const pending = (ao.injuries || []).map(inj => ({ team: inj.team, player: inj.player || "", status: inj.status || "Out" }));
+
+  const pendingListEl = document.createElement("div");
+  pendingListEl.className = "pending-list";
+  const renderPending = () => {
+    pendingListEl.innerHTML = "";
+    if (pending.length === 0) {
+      pendingListEl.innerHTML = '<p style="font-size:12px;color:var(--text-mute);font-style:italic">No injuries queued.</p>';
+      return;
+    }
+    for (let i = 0; i < pending.length; i++) {
+      const p = pending[i];
+      const item = document.createElement("div");
+      item.className = "pending-item";
+      item.innerHTML =
+        '<span class="pi-info"><strong>' + p.team + '</strong> — ' + (p.player || "(player)") + ' — ' + p.status + '</span>' +
+        '<button class="pi-remove" title="Remove">×</button>';
+      item.querySelector(".pi-remove").addEventListener("click", () => {
+        pending.splice(i, 1);
+        renderPending();
+      });
+      pendingListEl.appendChild(item);
+    }
+  };
+  renderPending();
+  panel.appendChild(pendingListEl);
+
+  // Add-injury form
+  const form = document.createElement("div");
+  form.className = "inj-form";
+  const formRow = document.createElement("div");
+  formRow.className = "inj-form-row";
+
+  const teamSel = document.createElement("select");
+  teamSel.innerHTML = '<option value="">Team</option>' +
+    Object.keys(PREDICTIONS.teams).sort().map(t => '<option value="' + t + '">' + t + '</option>').join("");
+
+  const playerInput = document.createElement("input");
+  playerInput.type = "text";
+  playerInput.placeholder = "Player name";
+
+  const statusSel = document.createElement("select");
+  statusSel.innerHTML = ['Questionable', 'Out'].map(s => '<option value="' + s + '">' + s + '</option>').join("");
+
+  const addBtn = document.createElement("button");
+  addBtn.className = "local-btn";
+  addBtn.textContent = "+ Add";
+  addBtn.addEventListener("click", () => {
+    if (!teamSel.value) return;
+    pending.push({ team: teamSel.value, player: playerInput.value.trim(), status: statusSel.value });
+    playerInput.value = "";
+    teamSel.value = "";
+    renderPending();
+  });
+
+  const teamLabel = document.createElement("label");
+  teamLabel.textContent = "Team";
+  const tWrap = document.createElement("div");
+  tWrap.innerHTML = '<label style="display:block;font-size:11px;color:var(--text-mute);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Team</label>';
+  tWrap.appendChild(teamSel);
+
+  const pWrap = document.createElement("div");
+  pWrap.innerHTML = '<label style="display:block;font-size:11px;color:var(--text-mute);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Player</label>';
+  pWrap.appendChild(playerInput);
+
+  const sWrap = document.createElement("div");
+  sWrap.innerHTML = '<label style="display:block;font-size:11px;color:var(--text-mute);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Status</label>';
+  sWrap.appendChild(statusSel);
+
+  formRow.appendChild(tWrap);
+  formRow.appendChild(pWrap);
+  formRow.appendChild(sWrap);
+  formRow.appendChild(addBtn);
+  form.appendChild(formRow);
+  panel.appendChild(form);
+
+  // Save button
+  const saveBtn = document.createElement("button");
+  saveBtn.className = "local-btn primary";
+  saveBtn.style.cssText = "margin-top:12px";
+  saveBtn.textContent = "Save Injuries & Refresh Predictions";
+  saveBtn.addEventListener("click", () => {
+    statusEl.className = "local-status warn";
+    statusEl.textContent = "Saving injury data and triggering refresh...";
+    const today = new Date().toISOString().slice(0, 10);
+    fetch(LOCAL_SERVER + "/api/injuries", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ injuries: pending, date: today }),
+    })
+      .then(r => r.json())
+      .then(d => {
+        if (d.error) {
+          statusEl.className = "local-status warn";
+          statusEl.textContent = d.error;
+        } else {
+          statusEl.className = "local-status ok";
+          statusEl.textContent = d.message || "Injury data saved. Predictions refreshing — this may take 30–60 seconds. Reload the dashboard to see updated predictions.";
+        }
+      })
+      .catch(() => {
+        statusEl.className = "local-status err";
+        statusEl.textContent = "Could not connect to local server. Start it with: cd ~/nba-playoffs-model && uv run python scripts/server.py. Then reload and try again.";
+      });
+  });
+  panel.appendChild(saveBtn);
+  panel.appendChild(statusEl);
+  root.appendChild(panel);
 }
 
 // ========== Results view ==========
