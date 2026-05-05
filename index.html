@@ -186,8 +186,46 @@
   .inj-flag     { color: var(--yellow); font-weight: 600; }
   .nav-hint     { color: var(--text-mute); margin-left: auto; }
 
-  /* === Game detail stub view === */
+  /* === Game detail view === */
   .game-stub { color: var(--text-mute); padding: 60px 20px; text-align: center; font-size: 15px; }
+  .back-btn { display: inline-flex; align-items: center; gap: 4px; color: var(--text-mute); font-size: 12px; background: none; border: none; cursor: pointer; font-family: inherit; padding: 0 0 14px; }
+  .back-btn:hover { color: var(--text); }
+  .cmp-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }
+  .cmp-section h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); margin-bottom: 12px; }
+  .game-matchup { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .game-series-ctx { font-size: 12px; color: var(--text-mute); margin-bottom: 12px; }
+  .game-base-pred { display: flex; gap: 24px; flex-wrap: wrap; padding-top: 12px; border-top: 1px dashed var(--border); margin-top: 12px; }
+  .game-pred-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-mute); margin-bottom: 3px; }
+  .game-pred-val { font-family: "SF Mono", Menlo, monospace; font-size: 15px; font-weight: 600; color: var(--fav); }
+  .cmp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cmp-table th { text-align: left; color: var(--text-mute); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 8px; border-bottom: 1px solid var(--border); }
+  .cmp-table td { padding: 8px 8px; border-bottom: 1px solid var(--border); font-family: "SF Mono", Menlo, monospace; }
+  .cmp-table td:first-child { font-family: inherit; color: var(--text-dim); font-size: 12px; }
+  .cmp-table tr:last-child td { border-bottom: none; }
+  .cmp-table .model-col { color: var(--fav); font-weight: 600; }
+  .cmp-table .market-col { color: var(--text-dim); }
+  .cmp-table .delta-pos { color: var(--green); }
+  .cmp-table .delta-neg { color: var(--red); }
+  .adj-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 480px) { .adj-panel { grid-template-columns: 1fr; } }
+  .adj-col-head { font-size: 11px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .inj-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .inj-item:last-child { border-bottom: none; }
+  .inj-item .inj-icon { flex-shrink: 0; }
+  .stat-legend { display: flex; gap: 16px; font-size: 11px; color: var(--text-dim); margin-bottom: 10px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+  .legend-green  { background: var(--green); }
+  .legend-yellow { background: var(--yellow); }
+  .legend-red    { background: var(--red); }
+  .stat-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .stat-table th { text-align: left; color: var(--text-mute); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; padding: 5px 8px; border-bottom: 1px solid var(--border); }
+  .stat-table td { padding: 7px 8px; border-bottom: 1px solid var(--border); font-family: "SF Mono", Menlo, monospace; }
+  .stat-table td:first-child { font-family: inherit; font-size: 12px; color: var(--text-dim); }
+  .stat-table tr:last-child td { border-bottom: none; }
+  .cell-green  { color: var(--green);  font-weight: 600; }
+  .cell-yellow { color: var(--yellow); font-weight: 600; }
+  .cell-red    { color: var(--red); }
+  .cell-dim    { color: var(--text-mute); }
 
   /* Loading / error states */
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -266,6 +304,25 @@ function teamColor(abbr, which = "primary") {
   return (TEAM_COLORS[abbr] || { primary: "#888", secondary: "#555" })[which];
 }
 
+// ========== Stat table config (tune thresholds here post-launch) ==========
+// Each row: label, homeKey/awayKey into team_stats, better=higher|lower|neutral,
+// fmt=pct|r2|r1|int, th={g,y} = green/yellow threshold on the diff.
+const STAT_ROWS = [
+  { label: "Net Rating",             homeKey: "net_rating",         awayKey: "net_rating",         better: "higher",  fmt: "r2",  th: { g: 4.0,  y: 1.0  } },
+  { label: "Offensive Rating",       homeKey: "off_rating",         awayKey: "off_rating",         better: "higher",  fmt: "r2",  th: { g: 4.0,  y: 2.0  } },
+  { label: "Defensive Rating",       homeKey: "def_rating",         awayKey: "def_rating",         better: "lower",   fmt: "r2",  th: { g: 4.0,  y: 2.0  } },
+  { label: "eFG% (Off)",             homeKey: "efg_pct",            awayKey: "efg_pct",            better: "higher",  fmt: "pct", th: { g: 0.03, y: 0.01 } },
+  { label: "eFG% (Def)",             homeKey: "opp_efg_pct",        awayKey: "opp_efg_pct",        better: "lower",   fmt: "pct", th: { g: 0.03, y: 0.01 } },
+  { label: "eFG% Differential",      homeKey: "_efg_diff",          awayKey: "_efg_diff",          better: "higher",  fmt: "pct", th: { g: 0.03, y: 0.01 } },
+  { label: "Pace",                   homeKey: "pace",               awayKey: "pace",               better: "neutral", fmt: "r1",  th: { g: 3.0,  y: 1.0  } },
+  { label: "Points in Paint",        homeKey: "pts_paint",          awayKey: "pts_paint",          better: "higher",  fmt: "r1",  th: { g: 6.0,  y: 3.0  } },
+  { label: "2nd Chance Pts Allowed", homeKey: "opp_pts_2nd_chance", awayKey: "opp_pts_2nd_chance", better: "lower",   fmt: "r1",  th: { g: 3.0,  y: 1.5  } },
+  { label: "Clutch Net Rating",      homeKey: "clutch_plus_minus",  awayKey: "clutch_plus_minus",  better: "higher",  fmt: "r2",  th: { g: 2.0,  y: 0.5  } },
+  { label: "Home/Away Win %",        homeKey: "home_w_pct",         awayKey: "away_w_pct",         better: "higher",  fmt: "pct", th: { g: 0.10, y: 0.04 } },
+  { label: "Rest Days",              homeKey: "rest_days",          awayKey: "rest_days",          better: "higher",  fmt: "int", th: { g: 2,    y: 1    } },
+  { label: "Season Win %",           homeKey: "w_pct",              awayKey: "w_pct",              better: "higher",  fmt: "pct", th: { g: 0.10, y: 0.04 } },
+];
+
 // ========== State ==========
 const state = {
   picks: {},               // slot_id -> {a: abbr, b: abbr}   (user's current selections per slot)
@@ -295,6 +352,24 @@ function winnerOf(abbrA, abbrB) {
 function slotById(id) { return PREDICTIONS.bracket_slots.find(s => s.id === id); }
 function fmtPct(x) { return (x * 100).toFixed(1) + "%"; }
 function fmtSpread(x) { return (x >= 0 ? "+" : "") + x.toFixed(1); }
+function fmtStat(val, fmt) {
+  if (val == null) return "—";
+  if (fmt === "pct") return (val * 100).toFixed(1) + "%";
+  if (fmt === "r2")  return (val >= 0 ? "+" : "") + val.toFixed(2);
+  if (fmt === "r1")  return val.toFixed(1);
+  if (fmt === "int") return String(Math.round(val));
+  return String(val);
+}
+function statCells(hVal, aVal, better, th) {
+  if (hVal == null || aVal == null || better === "neutral") return { hClass: "", aClass: "" };
+  const diff = better === "lower" ? aVal - hVal : hVal - aVal;
+  const abs = Math.abs(diff);
+  if (abs >= th.g) return diff > 0 ? { hClass: "cell-green", aClass: "cell-red"  }
+                                    : { hClass: "cell-red",   aClass: "cell-green" };
+  if (abs >= th.y) return diff > 0 ? { hClass: "cell-yellow", aClass: "cell-dim"  }
+                                    : { hClass: "cell-dim",    aClass: "cell-yellow" };
+  return { hClass: "", aClass: "" };
+}
 
 // ========== Tab navigation ==========
 document.querySelectorAll("nav.tabs button").forEach(btn => {
@@ -964,20 +1039,255 @@ function buildTodayCard(game) {
   return card;
 }
 
-// ========== Game detail view (Phase 9 stub) ==========
+// ========== Game detail view ==========
 function renderGame() {
   const root = document.getElementById("game-view");
   root.innerHTML = "";
+
   if (!state.todayGame) {
     root.innerHTML = '<div class="game-stub">Tap a game card on the Today tab to see full analysis.</div>';
     return;
   }
+
   const g = state.todayGame;
-  root.innerHTML =
-    '<div class="game-stub">' +
-    '<div style="font-size:18px;font-weight:600;margin-bottom:8px">' + g.away_team + ' @ ' + g.home_team + '</div>' +
-    '<div style="color:var(--text-dim);font-size:13px">Full game analysis coming in the next update.</div>' +
-    '</div>';
+  const homeAbbr = g.home_team;
+  const awayAbbr = g.away_team;
+  const mRef = g.evening_line || g.midday_line || g.morning_line;
+  const hStats = g.home_stats ? Object.assign({}, g.home_stats, {
+    _efg_diff: (g.home_stats.efg_pct != null && g.home_stats.opp_efg_pct != null)
+      ? g.home_stats.efg_pct - g.home_stats.opp_efg_pct : null,
+  }) : null;
+  const aStats = g.away_stats ? Object.assign({}, g.away_stats, {
+    _efg_diff: (g.away_stats.efg_pct != null && g.away_stats.opp_efg_pct != null)
+      ? g.away_stats.efg_pct - g.away_stats.opp_efg_pct : null,
+  }) : null;
+
+  // Back button
+  const backBtn = document.createElement("button");
+  backBtn.className = "back-btn";
+  backBtn.textContent = "← Back to Today";
+  backBtn.addEventListener("click", () => {
+    document.querySelector('nav.tabs button[data-tab="today"]').click();
+  });
+  root.appendChild(backBtn);
+
+  // ── Header ──────────────────────────────────────────────────────────────
+  const hdrSection = document.createElement("div");
+  hdrSection.className = "cmp-section";
+
+  const hDot = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + teamColor(homeAbbr) + ';margin-right:5px;vertical-align:middle"></span>';
+  const aDot = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + teamColor(awayAbbr) + ';margin-right:5px;vertical-align:middle"></span>';
+  const matchupEl = document.createElement("div");
+  matchupEl.className = "game-matchup";
+  matchupEl.innerHTML = hDot + (teamName(homeAbbr) || homeAbbr) +
+    '<span style="color:var(--text-mute);font-weight:400"> vs </span>' + aDot + (teamName(awayAbbr) || awayAbbr);
+  hdrSection.appendChild(matchupEl);
+
+  const ctxEl = document.createElement("div");
+  ctxEl.className = "game-series-ctx";
+  const ctxParts = [];
+  if (g.series_game_number) ctxParts.push("Game " + g.series_game_number);
+  if (g.series_id) ctxParts.push(g.series_id.split("_")[0].replace("|", " vs "));
+  ctxEl.textContent = ctxParts.join(" — ");
+  hdrSection.appendChild(ctxEl);
+
+  const winnerAbbr = g.predicted_winner === "home" ? homeAbbr : awayAbbr;
+  const winnerProb = g.win_prob_base != null
+    ? (g.predicted_winner === "home" ? g.win_prob_base : 1 - g.win_prob_base) : null;
+  const basePred = document.createElement("div");
+  basePred.className = "game-base-pred";
+  for (const [lbl, val] of [
+    ["Predicted Winner", winnerAbbr + (winnerProb != null ? " (" + (winnerProb * 100).toFixed(1) + "%)" : "")],
+    ["Base Spread (home)", g.predicted_spread_base != null ? fmtSpread(g.predicted_spread_base) : "—"],
+    ["Total", g.predicted_total != null ? "O/U " + g.predicted_total.toFixed(1) : "—"],
+  ]) {
+    const item = document.createElement("div");
+    item.innerHTML = '<div class="game-pred-label">' + lbl + '</div><div class="game-pred-val">' + val + '</div>';
+    basePred.appendChild(item);
+  }
+  hdrSection.appendChild(basePred);
+  root.appendChild(hdrSection);
+
+  // ── Model vs. Market ────────────────────────────────────────────────────
+  const mktSection = document.createElement("div");
+  mktSection.className = "cmp-section";
+  mktSection.innerHTML = '<h3>Model vs. Market</h3>';
+
+  if (mRef) {
+    const ms = mRef.market_spread;
+    const mt = mRef.market_total;
+    const spreadDelta = g.predicted_spread_base != null ? g.predicted_spread_base - ms : null;
+    const totalDelta  = g.predicted_total != null && mt != null ? g.predicted_total - mt : null;
+
+    const cmpTbl = document.createElement("table");
+    cmpTbl.className = "cmp-table";
+    cmpTbl.innerHTML = '<thead><tr><th></th><th>Base Model</th><th>Market</th><th>Delta</th></tr></thead>';
+    const cmpTb = document.createElement("tbody");
+
+    const sDelta = spreadDelta != null ? (spreadDelta >= 0 ? "+" : "") + spreadDelta.toFixed(1) : "—";
+    const sDeltaClass = spreadDelta == null ? "" : spreadDelta > 0.5 ? "delta-pos" : spreadDelta < -0.5 ? "delta-neg" : "";
+    const srRow = document.createElement("tr");
+    srRow.innerHTML = '<td>Spread (home)</td><td class="model-col">' +
+      (g.predicted_spread_base != null ? fmtSpread(g.predicted_spread_base) : "—") +
+      '</td><td class="market-col">' + fmtSpread(ms) +
+      '</td><td class="' + sDeltaClass + '">' + sDelta + '</td>';
+    cmpTb.appendChild(srRow);
+
+    const tDelta = totalDelta != null ? (totalDelta >= 0 ? "+" : "") + totalDelta.toFixed(1) : "—";
+    const tDeltaClass = totalDelta == null ? "" : Math.abs(totalDelta) > 1.5 ? (totalDelta > 0 ? "delta-pos" : "delta-neg") : "";
+    const trRow = document.createElement("tr");
+    trRow.innerHTML = '<td>Total</td><td class="model-col">' +
+      (g.predicted_total != null ? g.predicted_total.toFixed(1) : "—") +
+      '</td><td class="market-col">' + (mt != null ? mt.toFixed(1) : "—") +
+      '</td><td class="' + tDeltaClass + '">' + tDelta + '</td>';
+    cmpTb.appendChild(trRow);
+
+    cmpTbl.appendChild(cmpTb);
+    mktSection.appendChild(cmpTbl);
+
+    const leanEl = document.createElement("p");
+    leanEl.style.cssText = "margin-top:10px;font-size:13px;color:var(--text-dim)";
+    if (spreadDelta != null && Math.abs(spreadDelta) >= 2.0) {
+      const leanTeam = spreadDelta > 0 ? homeAbbr : awayAbbr;
+      const leanDir  = spreadDelta > 0 ? "Home" : "Away";
+      leanEl.innerHTML = 'Model on <strong style="color:var(--fav)">' + homeAbbr + " " + fmtSpread(g.predicted_spread_base) +
+        '</strong>; market <span style="color:var(--text-mute)">' + homeAbbr + " " + fmtSpread(ms) +
+        '</span> → lean <strong>' + leanDir + ' (' + leanTeam + ')</strong>';
+    } else {
+      leanEl.textContent = "Model and market within 2 pts — no lean signal.";
+    }
+    mktSection.appendChild(leanEl);
+
+    const srcEl = document.createElement("p");
+    srcEl.style.cssText = "margin-top:6px;font-size:11px;color:var(--text-mute)";
+    srcEl.textContent = "Consensus (DraftKings / FanDuel / BetMGM / Caesars) · " + (g.best_available_window || "—") + " line";
+    mktSection.appendChild(srcEl);
+  } else {
+    const noMkt = document.createElement("p");
+    noMkt.style.cssText = "color:var(--text-mute);font-size:13px";
+    noMkt.textContent = "No market line available for this game.";
+    mktSection.appendChild(noMkt);
+  }
+  root.appendChild(mktSection);
+
+  // ── Series Adjusted panel (only when override active) ────────────────────
+  if (g.predicted_spread_adjusted != null) {
+    const adjSection = document.createElement("div");
+    adjSection.className = "cmp-section";
+    adjSection.innerHTML = '<h3>Series Adjusted Prediction</h3>';
+
+    const adjPanel = document.createElement("div");
+    adjPanel.className = "adj-panel";
+
+    const flipActive = g.win_prob_base != null && g.win_prob_adjusted != null &&
+      ((g.win_prob_base >= 0.5) !== (g.win_prob_adjusted >= 0.5));
+    const flipHTML = flipActive
+      ? ' <em class="tg-flip" title="Series adjustment shifts predicted winner. Use judgment.">⚠️</em>' : "";
+
+    const baseCol = document.createElement("div");
+    baseCol.innerHTML =
+      '<div class="adj-col-head">Base Model</div>' +
+      '<div class="tg-label" style="margin-top:8px">Spread (home)</div>' +
+      '<div class="tg-val" style="font-size:15px">' + fmtSpread(g.predicted_spread_base) + '</div>' +
+      '<div class="tg-label" style="margin-top:10px">Win Probability</div>' +
+      '<div class="tg-val" style="font-size:15px">' + (g.win_prob_base != null ? (g.win_prob_base * 100).toFixed(1) + "%" : "—") + '</div>';
+    adjPanel.appendChild(baseCol);
+
+    const adjCol = document.createElement("div");
+    adjCol.innerHTML =
+      '<div class="adj-col-head" style="color:var(--yellow)">Series Adjusted</div>' +
+      '<div class="tg-label" style="margin-top:8px">Spread (home)</div>' +
+      '<div class="tg-val" style="font-size:15px;color:var(--yellow)">' + fmtSpread(g.predicted_spread_adjusted) + flipHTML + '</div>' +
+      '<div class="tg-label" style="margin-top:10px">Win Probability</div>' +
+      '<div class="tg-val" style="font-size:15px;color:var(--yellow)">' +
+      (g.win_prob_adjusted != null ? (g.win_prob_adjusted * 100).toFixed(1) + "%" : "—") + '</div>';
+    adjPanel.appendChild(adjCol);
+
+    adjSection.appendChild(adjPanel);
+
+    if (flipActive) {
+      const flipNote = document.createElement("p");
+      flipNote.style.cssText = "margin-top:12px;font-size:12px;color:var(--red)";
+      flipNote.textContent = "⚠️ Series adjustment shifts the predicted winner. Base Model is the primary output — Series Adjusted is supplementary context. Use judgment.";
+      adjSection.appendChild(flipNote);
+    }
+    root.appendChild(adjSection);
+  }
+
+  // ── Injury flags panel ───────────────────────────────────────────────────
+  const injSection = document.createElement("div");
+  injSection.className = "cmp-section";
+  injSection.innerHTML = '<h3>Injury Overrides</h3>';
+
+  const allInjuries = (PREDICTIONS.active_overrides && PREDICTIONS.active_overrides.injuries) || [];
+  const gameInjuries = allInjuries.filter(inj => inj.team === homeAbbr || inj.team === awayAbbr);
+
+  if (gameInjuries.length) {
+    for (const inj of gameInjuries) {
+      const item = document.createElement("div");
+      item.className = "inj-item";
+      item.innerHTML = '<span class="inj-icon">⚠️</span><span><strong>' + (inj.player || inj.team) + '</strong>' +
+        (inj.status ? ' listed <strong>' + inj.status + '</strong>' : '') + ' — team rating penalty applied</span>';
+      injSection.appendChild(item);
+    }
+  } else if (g.home_star_out || g.away_star_out) {
+    const teams = [];
+    if (g.home_star_out) teams.push(homeAbbr);
+    if (g.away_star_out) teams.push(awayAbbr);
+    const item = document.createElement("div");
+    item.className = "inj-item";
+    item.innerHTML = '<span class="inj-icon">⚠️</span><span>Star player override active for ' + teams.join(", ") + ' — team rating penalty applied</span>';
+    injSection.appendChild(item);
+  } else {
+    const noInj = document.createElement("p");
+    noInj.style.cssText = "color:var(--text-mute);font-size:13px";
+    noInj.textContent = "No injury overrides active for this game.";
+    injSection.appendChild(noInj);
+  }
+  root.appendChild(injSection);
+
+  // ── Stat comparison table ────────────────────────────────────────────────
+  const statSection = document.createElement("div");
+  statSection.className = "cmp-section";
+  statSection.innerHTML = '<h3>Team Stats (End of Regular Season)</h3>';
+
+  if (!hStats || !aStats) {
+    const noStats = document.createElement("p");
+    noStats.style.cssText = "color:var(--text-mute);font-size:13px";
+    noStats.textContent = "Team stats not available.";
+    statSection.appendChild(noStats);
+    root.appendChild(statSection);
+    return;
+  }
+
+  const legend = document.createElement("div");
+  legend.className = "stat-legend";
+  legend.innerHTML =
+    '<span><span class="legend-dot legend-green"></span>Strong edge</span>' +
+    '<span><span class="legend-dot legend-yellow"></span>Slight edge</span>' +
+    '<span><span class="legend-dot legend-red"></span>Disadvantage</span>';
+  statSection.appendChild(legend);
+
+  const statTbl = document.createElement("table");
+  statTbl.className = "stat-table";
+  statTbl.innerHTML =
+    '<thead><tr><th>Metric</th><th>' + homeAbbr + ' (home)</th><th>' + awayAbbr + ' (away)</th></tr></thead>';
+  const statTb = document.createElement("tbody");
+
+  for (const row of STAT_ROWS) {
+    const hVal = hStats[row.homeKey];
+    const aVal = aStats[row.awayKey];
+    const { hClass, aClass } = statCells(hVal, aVal, row.better, row.th);
+    const tr = document.createElement("tr");
+    tr.innerHTML =
+      '<td>' + row.label + '</td>' +
+      '<td class="' + hClass + '">' + fmtStat(hVal, row.fmt) + '</td>' +
+      '<td class="' + aClass + '">' + fmtStat(aVal, row.fmt) + '</td>';
+    statTb.appendChild(tr);
+  }
+  statTbl.appendChild(statTb);
+  statSection.appendChild(statTbl);
+  root.appendChild(statSection);
 }
 
 // ========== Initial render ==========
