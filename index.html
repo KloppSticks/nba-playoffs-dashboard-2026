@@ -153,6 +153,42 @@
     .metric-card .value { font-size: 20px; }
   }
 
+  /* === Today view === */
+  .today-empty { color: var(--text-mute); font-style: italic; padding: 60px 20px; text-align: center; font-size: 15px; }
+
+  .staleness-bar { margin-bottom: 16px; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 6px; }
+  .staleness-bar.stale { border-color: rgba(231,76,60,0.4); background: rgba(231,76,60,0.07); }
+  .staleness-date { font-size: 15px; font-weight: 600; color: var(--text); }
+  .staleness-age { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .staleness-age.stale-warn { color: var(--red); font-weight: 600; }
+
+  .today-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; box-shadow: var(--shadow); cursor: pointer; transition: border-color 0.15s, transform 0.1s; }
+  .today-card:hover { border-color: var(--border-strong); }
+  .today-card:active { transform: scale(0.995); }
+  .today-card.band-green  { border-left: 4px solid var(--green);  padding-left: 12px; }
+  .today-card.band-yellow { border-left: 4px solid var(--yellow); padding-left: 12px; }
+  .today-card.band-red    { border-left: 4px solid var(--red);    padding-left: 12px; }
+
+  .today-teams { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+  .today-ctx   { font-size: 11px; color: var(--text-mute); margin-bottom: 10px; }
+
+  .today-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; margin-bottom: 10px; }
+  @media (max-width: 480px) { .today-grid { grid-template-columns: 1fr; gap: 8px; } }
+  .tg-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-mute); margin-bottom: 3px; }
+  .tg-val   { font-family: "SF Mono", Menlo, monospace; font-size: 13px; }
+  .tg-winner { font-size: 14px; font-weight: 700; color: var(--fav); font-family: "SF Mono", Menlo, monospace; }
+  .tg-adj    { color: var(--yellow); }
+  .tg-flip   { color: var(--red); cursor: help; margin-left: 4px; font-style: normal; }
+  .tg-muted  { color: var(--text-mute); }
+
+  .today-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 11px; }
+  .edge-badge   { padding: 2px 8px; border-radius: 10px; background: rgba(74,144,226,0.15); color: var(--accent); border: 1px solid rgba(74,144,226,0.3); font-weight: 600; }
+  .inj-flag     { color: var(--yellow); font-weight: 600; }
+  .nav-hint     { color: var(--text-mute); margin-left: auto; }
+
+  /* === Game detail stub view === */
+  .game-stub { color: var(--text-mute); padding: 60px 20px; text-align: center; font-size: 15px; }
+
   /* Loading / error states */
   @keyframes spin { to { transform: rotate(360deg); } }
   #app-loading { text-align: center; padding: 80px 20px; color: var(--text-dim); }
@@ -167,7 +203,9 @@
 </header>
 
 <nav class="tabs">
-  <button data-tab="bracket" class="active">Bracket</button>
+  <button data-tab="today" class="active">Today</button>
+  <button data-tab="bracket">Bracket</button>
+  <button data-tab="game">Game Detail</button>
   <button data-tab="detail">Series Detail</button>
   <button data-tab="backtest">Backtest</button>
   <button data-tab="model">Model Info</button>
@@ -177,7 +215,9 @@
   <div id="app-loading"><div class="spinner"></div><p>Loading predictions...</p></div>
   <div id="app-error" style="display:none">Data unavailable — try refreshing.</div>
   <div id="app-content" style="display:none">
-    <section id="bracket-view" class="view active"></section>
+    <section id="today-view" class="view active"></section>
+    <section id="bracket-view" class="view"></section>
+    <section id="game-view" class="view"></section>
     <section id="detail-view" class="view"></section>
     <section id="backtest-view" class="view"></section>
     <section id="model-view" class="view"></section>
@@ -230,6 +270,7 @@ function teamColor(abbr, which = "primary") {
 const state = {
   picks: {},               // slot_id -> {a: abbr, b: abbr}   (user's current selections per slot)
   detailSlot: null,        // slot_id currently displayed in detail view
+  todayGame: null,         // game object from today_games, set when user taps a game card
 };
 
 // ========== Data helpers ==========
@@ -727,6 +768,218 @@ function renderModelInfo() {
   root.appendChild(lims);
 }
 
+// ========== Today view ==========
+function computeStaleness() {
+  const gen = new Date(PREDICTIONS.generated_at);
+  const diffMs = Date.now() - gen.getTime();
+  const diffHrs = diffMs / 3600000;
+  const stale = diffHrs > 24;
+  let label;
+  if (diffHrs < 0.1) label = "just now";
+  else if (diffHrs < 1) label = Math.round(diffHrs * 60) + " min ago";
+  else {
+    const h = Math.floor(diffHrs);
+    label = h === 1 ? "1 hour ago" : h + " hours ago";
+  }
+  return { label, stale };
+}
+
+function renderToday() {
+  const root = document.getElementById("today-view");
+  root.innerHTML = "";
+
+  const staleInfo = computeStaleness();
+  const sbar = document.createElement("div");
+  sbar.className = "staleness-bar" + (staleInfo.stale ? " stale" : "");
+  const dateEl = document.createElement("div");
+  dateEl.className = "staleness-date";
+  dateEl.textContent = PREDICTIONS.as_of_date;
+  sbar.appendChild(dateEl);
+  const ageEl = document.createElement("div");
+  ageEl.className = "staleness-age" + (staleInfo.stale ? " stale-warn" : "");
+  ageEl.textContent = staleInfo.stale
+    ? "⚠️ Data may be stale — check pipeline logs. Updated " + staleInfo.label
+    : "Data last updated " + staleInfo.label;
+  sbar.appendChild(ageEl);
+  root.appendChild(sbar);
+
+  const games = PREDICTIONS.today_games || [];
+  if (!games.length) {
+    const empty = document.createElement("div");
+    empty.className = "today-empty";
+    empty.textContent = "No games scheduled today.";
+    root.appendChild(empty);
+    return;
+  }
+
+  for (const game of games) {
+    root.appendChild(buildTodayCard(game));
+  }
+}
+
+function buildTodayCard(game) {
+  const homeAbbr = game.home_team;
+  const awayAbbr = game.away_team;
+  const winProb  = game.win_prob_base;
+  const hasInjury = game.home_star_out || game.away_star_out;
+
+  // Confidence band — based on predicted winner's probability
+  let band = "band-red";
+  if (!hasInjury && winProb != null) {
+    const conf = Math.max(winProb, 1 - winProb);
+    if (conf >= 0.65) band = "band-green";
+    else if (conf >= 0.55) band = "band-yellow";
+  }
+
+  const card = document.createElement("div");
+  card.className = "today-card " + band;
+
+  // Teams header
+  const teamsEl = document.createElement("div");
+  teamsEl.className = "today-teams";
+  const hDot = '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + teamColor(homeAbbr) + ';margin-right:4px;vertical-align:middle"></span>';
+  const aDot = '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + teamColor(awayAbbr) + ';margin-right:4px;vertical-align:middle"></span>';
+  teamsEl.innerHTML = hDot + homeAbbr + ' <span style="color:var(--text-mute);font-weight:400;margin:0 4px">vs</span>' + aDot + awayAbbr;
+  card.appendChild(teamsEl);
+
+  // Series context
+  const ctxEl = document.createElement("div");
+  ctxEl.className = "today-ctx";
+  let ctxParts = [];
+  if (game.series_game_number) ctxParts.push("Game " + game.series_game_number);
+  if (game.series_id) {
+    const teamPart = game.series_id.split("_")[0] || "";
+    ctxParts.push(teamPart.replace("|", " vs "));
+  }
+  ctxEl.textContent = ctxParts.join(" · ") || "Playoff game";
+  card.appendChild(ctxEl);
+
+  // 2×2 grid: winner | spread | total | market
+  const grid = document.createElement("div");
+  grid.className = "today-grid";
+
+  // Cell: Predicted Winner
+  const winnerAbbr = game.predicted_winner === "home" ? homeAbbr : awayAbbr;
+  const winnerProb = winProb != null
+    ? (game.predicted_winner === "home" ? winProb : 1 - winProb)
+    : null;
+  const winnerCell = document.createElement("div");
+  winnerCell.innerHTML =
+    '<div class="tg-label">Predicted Winner</div>' +
+    '<div class="tg-winner">' + winnerAbbr +
+    (winnerProb != null
+      ? ' <span style="font-weight:400;font-size:12px;color:var(--text-dim)">' + (winnerProb * 100).toFixed(1) + '%</span>'
+      : '') +
+    '</div>';
+  grid.appendChild(winnerCell);
+
+  // Cell: Spread — base always shown; adjusted shown alongside when override active; flip indicator when winner crosses 50%
+  const flipActive = winProb != null && game.win_prob_adjusted != null &&
+    ((winProb >= 0.5) !== (game.win_prob_adjusted >= 0.5));
+  const spreadCell = document.createElement("div");
+  let spreadHTML = '<div class="tg-label">Spread (home)</div><div class="tg-val">';
+  if (game.predicted_spread_base != null) {
+    spreadHTML += fmtSpread(game.predicted_spread_base);
+    if (game.predicted_spread_adjusted != null) {
+      spreadHTML += ' <span class="tg-adj" title="Series-adjusted">' + fmtSpread(game.predicted_spread_adjusted) + '</span>';
+    }
+    if (flipActive) {
+      spreadHTML += '<em class="tg-flip" title="Series adjustment shifts predicted winner. Use judgment.">⚠️</em>';
+    }
+  } else {
+    spreadHTML += '<span class="tg-muted">—</span>';
+  }
+  spreadHTML += '</div>';
+  spreadCell.innerHTML = spreadHTML;
+  grid.appendChild(spreadCell);
+
+  // Cell: Total
+  const totalCell = document.createElement("div");
+  totalCell.innerHTML =
+    '<div class="tg-label">Total</div>' +
+    '<div class="tg-val">' +
+    (game.predicted_total != null
+      ? 'O/U ' + game.predicted_total.toFixed(1)
+      : '<span class="tg-muted">—</span>') +
+    '</div>';
+  grid.appendChild(totalCell);
+
+  // Cell: Market Consensus — evening line preferred, then midday, then morning
+  const mRef = game.evening_line || game.midday_line || game.morning_line;
+  const marketCell = document.createElement("div");
+  let marketHTML = '<div class="tg-label">Market Consensus</div><div class="tg-val">';
+  if (mRef) {
+    const ms = mRef.market_spread;
+    const mt = mRef.market_total;
+    marketHTML += homeAbbr + ' ' + (ms >= 0 ? '+' : '') + ms.toFixed(1);
+    if (mt != null) marketHTML += ' / O ' + mt.toFixed(1);
+    const win = game.best_available_window;
+    if (win) marketHTML += ' <span class="tg-muted">(' + win + ')</span>';
+  } else {
+    marketHTML += '<span class="tg-muted">No line available</span>';
+  }
+  marketHTML += '</div>';
+  marketCell.innerHTML = marketHTML;
+  grid.appendChild(marketCell);
+
+  card.appendChild(grid);
+
+  // Footer: edge badge + injury flag + nav hint
+  const footer = document.createElement("div");
+  footer.className = "today-footer";
+
+  const edgeDelta = (mRef && game.predicted_spread_base != null)
+    ? game.predicted_spread_base - mRef.market_spread
+    : null;
+  if (edgeDelta != null && Math.abs(edgeDelta) >= 2.0) {
+    const badge = document.createElement("span");
+    badge.className = "edge-badge";
+    badge.textContent = "Model Edge: " + (edgeDelta > 0 ? "+" : "") + edgeDelta.toFixed(1) + " pts";
+    footer.appendChild(badge);
+  }
+
+  if (hasInjury) {
+    const inj = document.createElement("span");
+    inj.className = "inj-flag";
+    const parts = [];
+    if (game.home_star_out) parts.push(homeAbbr + " ★ out");
+    if (game.away_star_out) parts.push(awayAbbr + " ★ out");
+    inj.textContent = "⚠️ " + parts.join(", ");
+    footer.appendChild(inj);
+  }
+
+  const hint = document.createElement("span");
+  hint.className = "nav-hint";
+  hint.textContent = "tap for details →";
+  footer.appendChild(hint);
+
+  card.appendChild(footer);
+
+  card.addEventListener("click", () => {
+    state.todayGame = game;
+    renderGame();
+    document.querySelector('nav.tabs button[data-tab="game"]').click();
+  });
+
+  return card;
+}
+
+// ========== Game detail view (Phase 9 stub) ==========
+function renderGame() {
+  const root = document.getElementById("game-view");
+  root.innerHTML = "";
+  if (!state.todayGame) {
+    root.innerHTML = '<div class="game-stub">Tap a game card on the Today tab to see full analysis.</div>';
+    return;
+  }
+  const g = state.todayGame;
+  root.innerHTML =
+    '<div class="game-stub">' +
+    '<div style="font-size:18px;font-weight:600;margin-bottom:8px">' + g.away_team + ' @ ' + g.home_team + '</div>' +
+    '<div style="color:var(--text-dim);font-size:13px">Full game analysis coming in the next update.</div>' +
+    '</div>';
+}
+
 // ========== Initial render ==========
 fetch('data.json')
   .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -741,7 +994,9 @@ fetch('data.json')
       PREDICTIONS.generated_at.slice(0, 16).replace('T', ' ') + ' UTC';
     document.getElementById('app-loading').style.display = 'none';
     document.getElementById('app-content').style.display = '';
+    renderToday();
     renderBracket();
+    renderGame();
     renderDetail();
     renderBacktest();
     renderModelInfo();
